@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <header class="main-header">
+            <h1>Student Course Management</h1>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <main class="content-grid">
+            <div class="card forms-card">
+                <h2>Management Actions</h2>
+                
+                <form action="/add_student" method="post" class="form-section">
+                    <h3>Add New Student</h3>
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="number" id="student_id" name="student_id" placeholder="e.g., 101" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_name">Student Name</label>
+                        <input type="text" id="student_name" name="student_name" placeholder="e.g., Abhishek Kumar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Undergraduate">Undergraduate</option>
+                            <option value="Postgraduate">Postgraduate</option>
+                            <option value="Doctoral">Doctoral</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Student</button>
+                </form>
+
+                <form action="/add_course" method="post" class="form-section">
+                    <h3>Enroll in Course</h3>
+                    <div class="form-group">
+                        <label for="enroll_student_id">Select Student</label>
+                        <select id="enroll_student_id" name="student_id" required>
+                            <option value="">-- Select Student --</option>
+                            {% for student in students %}
+                                <option value="{{ student.id }}">{{ student.name }} (ID: {{ student.id }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course_name">Course Name</label>
+                        <input type="text" id="course_name" name="course_name" placeholder="e.g., Web Development" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enroll</button>
+                </form>
+            </div>
+
+            <div class="card students-card">
+                <h2>Registered Students</h2>
+                <div class="student-list">
+                    {% for student in students %}
+                        <div class="student-item">
+                            <div class="student-info">
+                                <div class="student-header">
+                                    <span class="student-name">{{ student.name }} (ID: {{ student.id }})</span>
+                                    <span class="category-tag">{{ student.category }}</span>
+                                </div>
+                                <div class="course-list">
+    <h4>Courses:</h4>
+    <ul>
+        {% for course in student.courses %}
+            <li>{{ course }}</li>
+        {% else %}
+            <li class="no-courses">No courses enrolled yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+                            </div>
+                            <form class="delete-form" action="{{ url_for('delete_student', student_id=student.id) }}" method="post">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this student and all their courses?');">Delete</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <p class="no-students">No students have been added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
